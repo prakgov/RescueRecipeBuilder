@@ -1,0 +1,31 @@
+body {
+  background: #f6f8f5;
+}
+
+.recipe-card img {
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.recipe-thumb-placeholder {
+  aspect-ratio: 16 / 7;
+  display: grid;
+  place-items: center;
+  font-size: 3rem;
+  background: #e5efe3;
+}
+
+.stat-tile .value {
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.chart-tooltip {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
