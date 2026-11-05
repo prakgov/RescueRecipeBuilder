@@ -75,3 +75,30 @@ One-time setup (repo owner): **Settings → Pages → Build and deployment → S
 
 - No CO₂ or money-saved claims are made. The app only counts ingredients you actually used.
 - TheMealDB has a small curated recipe set (~300), so some fridges will get few matches.
+
+## Roadmap: full-stack FridgeSaver
+
+> **Planned work, not yet built.** This roadmap is for after the course project and is not part of the course submission.
+
+The goal is an installable app that works offline and keeps a signed-in user's fridge and cooking log in sync across devices, while staying on free cloud tiers.
+
+```mermaid
+flowchart LR
+  APP[React PWA] <-->|local first| IDB[(IndexedDB + outbox)]
+  APP -->|recipes| SW[Service worker] --> MDB[TheMealDB]
+  APP -->|/api/sync| SWA[Azure Static Web Apps: hosting + sign-in]
+  SWA --> FN[Azure Functions API]
+  FN -->|parameterised SQL| SQL[(Azure SQL Database, free offer)]
+```
+
+| Phase | Planned features |
+|---|---|
+| **1. Installable PWA** | Web app manifest and icons; service worker (Workbox via `vite-plugin-pwa`) so the app opens offline; cached TheMealDB responses and images; "new version available" prompt; offline indicator. Can stay on GitHub Pages. |
+| **2. Backend** | Move hosting to Azure Static Web Apps (Free plan); Azure Functions API in `api/` using `mssql`; Azure SQL Database on the free offer with tables for users, fridge items and the cooking log; SQL migrations in `db/migrations/`; CI deploys the app and API with preview environments for pull requests. |
+| **3. Sign-in and sync** | Built-in sign-in (GitHub or Microsoft); local-first storage in IndexedDB with an outbox of pending changes; one `POST /api/sync` round trip to push and pull changes (last write wins per record); import existing local data on first sign-in; anonymous use keeps working locally. |
+| **4. Hardening** | API and sync unit tests (including that every query is scoped to the signed-in user); retry with backoff while the database wakes from auto-pause; budget alert and "pause when the free allowance is used up"; setup guide. |
+
+Key constraints:
+- **No database credentials in the browser.** The connection string stays in server-side app settings; the browser only talks to `/api`.
+- **Free tiers.** Azure SQL's free offer gives each database 100,000 vCore seconds of compute and 32 GB of data per month and auto-pauses when idle, so the app never waits on the database: it saves locally first and syncs in the background.
+- **Not using Static Web Apps "database connections".** That built-in feature has been retired, so the API is our own Azure Functions code.
