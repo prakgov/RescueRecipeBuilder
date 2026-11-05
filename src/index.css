@@ -29,3 +29,18 @@ body {
   font-size: 0.85rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
+
+/* Recipe step checklist */
+.step-check .form-check-label {
+  cursor: pointer;
+}
+
+.step-check .step-num {
+  font-weight: 600;
+  color: #495057;
+}
+
+.step-check.is-done .form-check-label {
+  text-decoration: line-through;
+  color: #6c757d;
+}

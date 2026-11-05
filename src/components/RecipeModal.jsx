@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { lookupMeal } from '../api/mealdb.js';
 import { useFridge } from '../context/FridgeContext.jsx';
 import { extractIngredients, inFridge, splitIngredients } from '../lib/matching.js';
+import InstructionChecklist from './InstructionChecklist.jsx';
 
 /** Recipe details sub-route (/matches/:mealId) shown as a modal over the matches list. */
 export default function RecipeModal({ mealId, onHide }) {
@@ -111,12 +112,9 @@ export default function RecipeModal({ mealId, onHide }) {
                 </ul>
               </Col>
             </Row>
-            <h3 className="h6">Instructions</h3>
-            <p className="small" style={{ whiteSpace: 'pre-line' }}>
-              {meal.strInstructions}
-            </p>
+            <InstructionChecklist key={meal.idMeal} text={meal.strInstructions} />
             {meal.strYoutube && (
-              <a href={meal.strYoutube} target="_blank" rel="noreferrer" className="small">
+              <a href={meal.strYoutube} target="_blank" rel="noreferrer" className="small d-inline-block mt-2">
                 Watch on YouTube ↗
               </a>
             )}
