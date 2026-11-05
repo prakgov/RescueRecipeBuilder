@@ -10,7 +10,7 @@ FridgeSaver is a React web app for people who want to use up what's in their fri
 - **Recipes:** the free [TheMealDB](https://www.themealdb.com/api.php) API (public test key `1`, no signup, nothing secret in the bundle)
 - **Data:** stays in your browser (`localStorage`); no account needed
 - **Status:** working prototype; a full-stack version is [planned](#planned-features)
-- **Architecture:** see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the current and planned designs
+- **Architecture:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (current design + planned overview) and [docs/DESIGN.md](docs/DESIGN.md) (full planned design)
 
 ## Table of contents
 
@@ -105,7 +105,7 @@ One-time setup (repo owner): **Settings → Pages → Build and deployment → S
 
 > **Planned work, not yet built.** These features are for after the course project and are not part of the course submission.
 
-FridgeSaver is planned to grow into a full-stack app: installable, usable offline, and able to sync a signed-in user's fridge across devices using Azure SQL on a free tier. The full design (components, diagrams, API, database schema, phases and risks) is in **[docs/ARCHITECTURE.md → Planned architecture](docs/ARCHITECTURE.md#planned-architecture)**.
+FridgeSaver is planned to grow into a full-stack app: installable, usable offline, and able to sync a signed-in user's fridge across devices using Azure SQL on a free tier. A short overview is in [docs/ARCHITECTURE.md → Planned architecture](docs/ARCHITECTURE.md#planned-architecture), and the full design (components, diagrams, API, database schema, phases and risks) is in **[docs/DESIGN.md](docs/DESIGN.md)**.
 
 ### Roadmap: full-stack FridgeSaver
 
