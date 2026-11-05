@@ -50,6 +50,27 @@ npm test         # unit tests for the matching logic
 npm run build    # static build in dist/ (relative base, ready for GitHub Pages)
 ```
 
+## Deployment (GitHub Pages)
+
+Live site: **https://prakgov.github.io/RescueRecipeBuilder/**
+
+`.github/workflows/deploy.yml` runs on GitHub Actions:
+
+```mermaid
+flowchart LR
+  PR[Pull request to main] --> B
+  M[Push to main] --> B
+  W[Manual run] --> B
+  B["build: npm ci → lint → test → build"] -->|PR| X[Stop: checks only]
+  B -->|main| U[Upload dist/ as Pages artifact] --> D[deploy: actions/deploy-pages] --> L[Live site]
+```
+
+- Pull requests are linted, tested and built, but never deployed.
+- A push to `main` (for example, merging a PR) publishes the new build.
+- The build uses relative asset paths (`base: './'`) and `HashRouter`, so it works under the `/RescueRecipeBuilder/` sub-path.
+
+One-time setup (repo owner): **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+
 ## Notes
 
 - No CO₂ or money-saved claims are made. The app only counts ingredients you actually used.
