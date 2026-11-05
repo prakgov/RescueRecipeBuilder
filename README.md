@@ -9,7 +9,7 @@ Cook what's already in your fridge and waste less food. A React prototype built 
 |---|---|---|
 | `#/fridge` | **My Fridge** | Add ingredients (autocomplete from `list.php?i=list`) with use-by dates. Items are sorted by expiry and badged *Use now / Use soon / Fresh / Expired*. |
 | `#/matches` | **Recipe Matches** | Recipes ranked by how many fridge items they use, with expiring items weighted higher. |
-| `#/matches/:mealId` | Recipe modal | Used vs missing ingredients, instructions, and an **I cooked this** button that logs the meal and removes the used items. |
+| `#/matches/:mealId` | Recipe modal | Used vs missing ingredients, instructions as a tickable step checklist (original text unchanged, one click away), and an **I cooked this** button that logs the meal and removes the used items. |
 | `#/saved` | **Saved from Waste** | Stat tiles, a Recharts bar chart of items rescued per day/week, most-rescued items and the cooking log. |
 
 ## The matching algorithm (`src/lib/matching.js`)
