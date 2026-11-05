@@ -102,3 +102,15 @@ Key constraints:
 - **No database credentials in the browser.** The connection string stays in server-side app settings; the browser only talks to `/api`.
 - **Free tiers.** Azure SQL's free offer gives each database 100,000 vCore seconds of compute and 32 GB of data per month and auto-pauses when idle, so the app never waits on the database: it saves locally first and syncs in the background.
 - **Not using Static Web Apps "database connections".** That built-in feature has been retired, so the API is our own Azure Functions code.
+
+## License
+
+Copyright (C) 2026 Prakirth Govardhanam
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License along with this program (see [`LICENSE`](LICENSE)). If not, see <https://www.gnu.org/licenses/>.
+
+If you run a modified version of FridgeSaver as a network service, the AGPL requires you to offer its users the corresponding source code.
