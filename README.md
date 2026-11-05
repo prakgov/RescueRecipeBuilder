@@ -1,7 +1,29 @@
 # 🥕 FridgeSaver
 
-Cook what's already in your fridge and waste less food. A React prototype built on the free
-[TheMealDB](https://www.themealdb.com/api.php) API (public test key `1`, no signup, nothing secret in the bundle).
+Cook what's already in your fridge and waste less food.
+
+## Overview
+
+FridgeSaver is a React web app for people who want to use up what's in their fridge before it goes off. You add ingredients with their use-by dates, and the app suggests recipes that use as many of them as possible, ranking recipes that rescue soon-to-expire items first. When you cook a meal, it logs what you saved and charts it over time.
+
+- **Live site:** https://prakgov.github.io/RescueRecipeBuilder/
+- **Recipes:** the free [TheMealDB](https://www.themealdb.com/api.php) API (public test key `1`, no signup, nothing secret in the bundle)
+- **Data:** stays in your browser (`localStorage`); no account needed
+- **Status:** working prototype; a full-stack version is [planned](#planned-features)
+- **Architecture:** see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the current and planned designs
+
+## Table of contents
+
+- [Overview](#overview)
+- [Screens](#screens)
+- [The matching algorithm](#the-matching-algorithm-srclibmatchingjs)
+- [Tech](#tech)
+- [Run it](#run-it)
+- [Deployment (GitHub Pages)](#deployment-github-pages)
+- [Notes](#notes)
+- [Planned features](#planned-features)
+  - [Roadmap: full-stack FridgeSaver](#roadmap-full-stack-fridgesaver)
+- [License](#license)
 
 ## Screens
 
@@ -36,17 +58,20 @@ src/
   api/mealdb.js          TheMealDB calls + cache + offline fallback
   lib/expiry.js          days-left, status buckets, weights
   lib/matching.js        rankRecipes, splitIngredients (pure, unit-tested)
+  lib/instructions.js    splitInstructions (recipe text → checklist steps, unit-tested)
   context/FridgeContext  fridge items + cooking log
   pages/                 FridgePage, MatchesPage, SavedPage
-  components/RecipeModal
+  components/            RecipeModal, InstructionChecklist
 ```
+
+For diagrams of how these pieces fit together, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#current-architecture).
 
 ## Run it
 
 ```bash
 npm install
 npm run dev      # http://localhost:5173
-npm test         # unit tests for the matching logic
+npm test         # unit tests (matching, expiry, instruction steps)
 npm run build    # static build in dist/ (relative base, ready for GitHub Pages)
 ```
 
@@ -76,9 +101,13 @@ One-time setup (repo owner): **Settings → Pages → Build and deployment → S
 - No CO₂ or money-saved claims are made. The app only counts ingredients you actually used.
 - TheMealDB has a small curated recipe set (~300), so some fridges will get few matches.
 
-## Roadmap: full-stack FridgeSaver
+## Planned features
 
-> **Planned work, not yet built.** This roadmap is for after the course project and is not part of the course submission.
+> **Planned work, not yet built.** These features are for after the course project and are not part of the course submission.
+
+FridgeSaver is planned to grow into a full-stack app: installable, usable offline, and able to sync a signed-in user's fridge across devices using Azure SQL on a free tier. The full design (components, diagrams, API, database schema, phases and risks) is in **[docs/ARCHITECTURE.md → Planned architecture](docs/ARCHITECTURE.md#planned-architecture)**.
+
+### Roadmap: full-stack FridgeSaver
 
 The goal is an installable app that works offline and keeps a signed-in user's fridge and cooking log in sync across devices, while staying on free cloud tiers.
 
