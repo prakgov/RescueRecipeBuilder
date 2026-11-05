@@ -1,7 +1,29 @@
 # 🥕 FridgeSaver
 
-Cook what's already in your fridge and waste less food. A React prototype built on the free
-[TheMealDB](https://www.themealdb.com/api.php) API (public test key `1`, no signup, nothing secret in the bundle).
+Cook what's already in your fridge and waste less food.
+
+## Overview
+
+FridgeSaver is a React web app for people who want to use up what's in their fridge before it goes off. You add ingredients with their use-by dates, and the app suggests recipes that use as many of them as possible, ranking recipes that rescue soon-to-expire items first. When you cook a meal, it logs what you saved and charts it over time.
+
+- **Live site:** https://prakgov.github.io/RescueRecipeBuilder/
+- **Recipes:** the free [TheMealDB](https://www.themealdb.com/api.php) API (public test key `1`, no signup, nothing secret in the bundle)
+- **Data:** stays in your browser (`localStorage`); no account needed
+- **Status:** working prototype; a full-stack version is [planned](#planned-features)
+- **Architecture:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (current design + planned overview) and [docs/DESIGN.md](docs/DESIGN.md) (full planned design)
+
+## Table of contents
+
+- [Overview](#overview)
+- [Screens](#screens)
+- [The matching algorithm](#the-matching-algorithm-srclibmatchingjs)
+- [Tech](#tech)
+- [Run it](#run-it)
+- [Deployment (GitHub Pages)](#deployment-github-pages)
+- [Notes](#notes)
+- [Planned features](#planned-features)
+  - [Roadmap: full-stack FridgeSaver](#roadmap-full-stack-fridgesaver)
+- [License](#license)
 
 ## Screens
 
@@ -36,17 +58,20 @@ src/
   api/mealdb.js          TheMealDB calls + cache + offline fallback
   lib/expiry.js          days-left, status buckets, weights
   lib/matching.js        rankRecipes, splitIngredients (pure, unit-tested)
+  lib/instructions.js    splitInstructions (recipe text → checklist steps, unit-tested)
   context/FridgeContext  fridge items + cooking log
   pages/                 FridgePage, MatchesPage, SavedPage
-  components/RecipeModal
+  components/            RecipeModal, InstructionChecklist
 ```
+
+For diagrams of how these pieces fit together, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#current-architecture).
 
 ## Run it
 
 ```bash
 npm install
 npm run dev      # http://localhost:5173
-npm test         # unit tests for the matching logic
+npm test         # unit tests (matching, expiry, instruction steps)
 npm run build    # static build in dist/ (relative base, ready for GitHub Pages)
 ```
 
@@ -75,3 +100,46 @@ One-time setup (repo owner): **Settings → Pages → Build and deployment → S
 
 - No CO₂ or money-saved claims are made. The app only counts ingredients you actually used.
 - TheMealDB has a small curated recipe set (~300), so some fridges will get few matches.
+
+## Planned features
+
+> **Planned work, not yet built.** These features are for after the course project and are not part of the course submission.
+
+FridgeSaver is planned to grow into a full-stack app: installable, usable offline, and able to sync a signed-in user's fridge across devices using Azure SQL on a free tier. A short overview is in [docs/ARCHITECTURE.md → Planned architecture](docs/ARCHITECTURE.md#planned-architecture), and the full design (components, diagrams, API, database schema, phases and risks) is in **[docs/DESIGN.md](docs/DESIGN.md)**.
+
+### Roadmap: full-stack FridgeSaver
+
+The goal is an installable app that works offline and keeps a signed-in user's fridge and cooking log in sync across devices, while staying on free cloud tiers.
+
+```mermaid
+flowchart LR
+  APP[React PWA] <-->|local first| IDB[(IndexedDB + outbox)]
+  APP -->|recipes| SW[Service worker] --> MDB[TheMealDB]
+  APP -->|/api/sync| SWA[Azure Static Web Apps: hosting + sign-in]
+  SWA --> FN[Azure Functions API]
+  FN -->|parameterised SQL| SQL[(Azure SQL Database, free offer)]
+```
+
+| Phase | Planned features |
+|---|---|
+| **1. Installable PWA** | Web app manifest and icons; service worker (Workbox via `vite-plugin-pwa`) so the app opens offline; cached TheMealDB responses and images; "new version available" prompt; offline indicator. Can stay on GitHub Pages. |
+| **2. Backend** | Move hosting to Azure Static Web Apps (Free plan); Azure Functions API in `api/` using `mssql`; Azure SQL Database on the free offer with tables for users, fridge items and the cooking log; SQL migrations in `db/migrations/`; CI deploys the app and API with preview environments for pull requests. |
+| **3. Sign-in and sync** | Built-in sign-in (GitHub or Microsoft); local-first storage in IndexedDB with an outbox of pending changes; one `POST /api/sync` round trip to push and pull changes (last write wins per record); import existing local data on first sign-in; anonymous use keeps working locally. |
+| **4. Hardening** | API and sync unit tests (including that every query is scoped to the signed-in user); retry with backoff while the database wakes from auto-pause; budget alert and "pause when the free allowance is used up"; setup guide. |
+
+Key constraints:
+- **No database credentials in the browser.** The connection string stays in server-side app settings; the browser only talks to `/api`.
+- **Free tiers.** Azure SQL's free offer gives each database 100,000 vCore seconds of compute and 32 GB of data per month and auto-pauses when idle, so the app never waits on the database: it saves locally first and syncs in the background.
+- **Not using Static Web Apps "database connections".** That built-in feature has been retired, so the API is our own Azure Functions code.
+
+## License
+
+Copyright (C) 2026 Prakirth Govardhanam
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License along with this program (see [`LICENSE`](LICENSE)). If not, see <https://www.gnu.org/licenses/>.
+
+If you run a modified version of FridgeSaver as a network service, the AGPL requires you to offer its users the corresponding source code.
