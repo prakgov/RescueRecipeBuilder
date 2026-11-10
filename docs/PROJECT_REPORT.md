@@ -1,187 +1,85 @@
-# FridgeSaver: Project Report
+# Web Programming Final Project: FridgeSaver
+*Cook what is already in your fridge and waste less food.*
 
-*Cook what's already in your fridge and waste less food.*
+Prakirth Govardhanam | November 2026 | Repository: [RescueRecipeBuilder](https://github.com/prakgov/RescueRecipeBuilder/)
 
-Prakirth Govardhanam · November 2026 · Repository: RescueRecipeBuilder
 
-> Screenshots were taken from the running app using sample fridge data and a sample cooking log.
+## Table of contents
+- [1. Project description](#1-project-description)
+- [2. Screenshots](#2-screenshots)
+- [3. AI usage statement](#3-ai-usage-statement)
+- [4. Reflection](#4-reflection)
+- [Appendix: My Claude Code workflow](#appendix-my-claude-code-workflow)
+- [More Technical detail](TECHNICAL_OVERVIEW.md): matching algorithm, fallbacks, deployment, architecture and roadmap diagrams
 
-## Summary
 
-FridgeSaver is a React web app for people who want to use up what's in their fridge before it goes off. Users add ingredients with their use-by dates, and the app suggests recipes that use as many of them as possible, ranking recipes that rescue soon-to-expire items first. When a user cooks a meal, the app logs what was saved and charts it over time.
+## 1. Project description
 
-The project is a working prototype, deployed as a static site. It needs no account or backend: recipes come from a free public API, and all personal data stays in the browser.
+- The app is a React web app for people who want to use up what is in their fridge before it becomes expired and goes into the garbage. 
+- Users add ingredients with their use-by dates, and the app suggests recipes that use as many of them as possible, ranking recipes that rescue soon-to-expire items first. When a meal is cooked, it logs what was saved and charts it over time.
+- API: [TheMealDB](https://www.themealdb.com/api.php) (free, keyless public test key, so nothing secret in the static bundle).
+- Libraries and their jobs:
 
-| | |
-|---|---|
-| **Live site** | [prakgov.github.io/RescueRecipeBuilder](https://prakgov.github.io/RescueRecipeBuilder/) |
-| **Status** | Working prototype; full-stack version planned |
-| **Recipe data** | TheMealDB API (free public test key) |
-| **User data** | Browser `localStorage`; no account needed |
+| Library | Function |
+|---------|----------|
+| React 19 + Vite | UI and build |
+| React-Bootstrap | Layout and components |
+| React Router (HashRouter) | Routes that work on GitHub Pages |
+| Recharts | The "items rescued" bar chart |
+| date-fns | Days-left and weekly/daily buckets |
+| react-hot-toast | Notifications |
+| Vitest | Unit tests |
 
-## What the app does
+- Data stays in the browser (localStorage) and no account is needed.
 
-### My Fridge (`#/fridge`)
+- **Repository:** https://github.com/prakgov/RescueRecipeBuilder
+- **Live app:** https://prakgov.github.io/RescueRecipeBuilder/
 
-Add ingredients, with autocomplete from TheMealDB's ingredient list, and their use-by dates. Items are sorted by expiry and badged *Use now*, *Use soon*, *Fresh* or *Expired*.
+## 2. Screenshots
+
+Screenshots were taken using sample data.
+
+- Screen 1 - **My Fridge**: ingredients sorted by use-by date, with status badges.
 
 ![My Fridge screen with seven ingredients sorted by expiry and badged Expired, Use now, Use soon or Fresh](images/report/fridge.png)
 
-### Recipe Matches (`#/matches`)
-
-Recipes ranked by how many fridge items they use, with expiring items weighted higher.
+- Screen 2 - **Recipe Matches**: recipes ranked by how many fridge items they use, with expiring items weighted higher.
 
 ![Recipe Matches screen showing recipe cards with score, matched items and urgent items rescued](images/report/matches.png)
 
-### Recipe modal (`#/matches/:mealId`)
-
-Used and missing ingredients, instructions as a tickable step checklist with the original text one click away, and an **I cooked this** button that logs the meal and removes the used items.
-
-![Recipe modal listing ingredients you have and are missing, a step checklist and the I cooked this button](images/report/modal.png)
-
-### Saved from Waste (`#/saved`)
-
-Stat tiles, a bar chart of items rescued per day or week, most-rescued items and the cooking log.
+- Screen 3 - **Saved from Waste**: items rescued over time and the cooking log.
 
 ![Saved from Waste screen with stat tiles, a weekly bar chart, most-rescued items and the cooking log](images/report/saved.png)
 
-## Honest measurement
+- **Feature highlight: recipe modal**: have/missing ingredients, a step checklist, and the *I cooked this* button.
 
-FridgeSaver makes no CO₂ or money-saved claims. Its impact figures only count ingredients the user actually used in a meal they logged.
+![Recipe modal listing ingredients you have and are missing, a step checklist and the I cooked this button](images/report/modal.png)
 
-## Technology
+## 3. AI usage statement
 
-React 19, Vite, React-Bootstrap, React Router (`HashRouter`), Recharts, date-fns, react-hot-toast.
+- I used Claude Code to plan, build features, refactor, and debug issues. **To keep its output under my control, I spent a lot of time building skills and rules that make it follow my engineering workflow (see [Appendix](#appendix-my-claude-code-workflow))**. Claude Code(Sonnet/Opus) was used roughly for 1-2 hours to complete this project and I spent roughly 2-3 hours reviewing and editing its output. Claude Code was also used to generate a draft of this report which I actively edited and modified. 
+- I **used AI to** generate the initial prototype from my written plan (PR #1), build the GitHub Pages CI/CD pipeline and diagnose its first failed deploy (PR #3), implement the recipe text split into a verbatim step checklist with a unit test (PR #6), plan the full-stack PWA + Azure design and architecture docs (PR #8), fix a footer floating mid-screen after spotting it in the browser (PR #9), and run the app to capture screenshots, which exposed a possible recipe matches count bug (*'Use X of your items'*).
+- I chose **not to use AI for** enabling GitHub Pages myself (repo-owner step), checking the UI in the browser (caught the footer bug), direction calls regarding open-source licensing, approving the force-push, docs layout for architecture diagrams and planned design, time estimates, and reflections since the UI, user experience, open sourcing and architectural decisions are subjective and I wanted to make those decisions myself.
 
-Application state lives in `FridgeContext` and persists to `localStorage` under `fs-fridge` and `fs-log`.
 
-## The matching algorithm
+## 4. Reflection
 
-The core engineering problem comes from an API limit: the free tier of TheMealDB can only filter by **one** ingredient. FridgeSaver therefore does multi-ingredient matching on the client, in `src/lib/matching.js`.
+- The most challenging part was designing around an API that offered free, keyless access, so the application could be deployed and used right away. I started by focusing on the idea that I want to build something specific for myself that helps me on a daily basis. From there, I researched APIs that would allow me to build a recipe app and I found TheMealDB but it only allows filtering by one ingredient at a time. Then I had to figure out how to implement a multi-ingredient matching algorithm on the client side, which was a fun challenge. I also had to consider how to handle edge cases, such as when no recipes match the user's fridge items, and how to provide a good user experience in those situations. See [Technical Overview](TECHNICAL_OVERVIEW.md) for matching algorithm. I chose TheMealDB over Spoonacular for the app to be deployed and used without any barriers.
+- I opted for `localStorage` instead of a backend to keep the app simple and user-friendly, and used `HashRouter` with relative paths to ensure compatibility with GitHub Pages. I also separated pure logic into `src/lib` for easier unit testing and chose a flex sticky footer over a fixed position to improve layout responsiveness and keep it from covering the content. Additionally, I selected the AGPL license to keep the code open-sourced forever.
+- With more time, I would focus on testing the application thoroughly, implementing the planned roadmap phases, including making the app an installable PWA, adding an Azure backend for data synchronization, and enabling user sign-in to sync fridge and cooking log data across devices. I would also address the recipe card vs modal count mismatch bug.
+- Overall, I gained a deeper understanding of how to handle API limitations, implement client-side logic for data processing, and design a user-friendly interface that effectively helps users reduce food waste. 
+- This experience reminded me of the project workflow from Software Engineering 1 and Information Systems Design courses, where I learned to break down complex problems into manageable components and iteratively build solutions while considering user experience and technical constraints.
 
-1. **Fan out.** Call `filter.php?i=` once per fridge item, in parallel.
-2. **Merge and count.** Build a `Map` keyed by `idMeal`, recording which items each recipe matched.
-3. **Weight by expiry.** Each matched item adds a weight. Sort by score, then match count, then name.
-4. **Fetch details.** Run `lookup.php?i=` for the top 6 recipes only, to show the missing count.
+## Appendix: My Claude Code workflow
 
-Because full details are fetched only for the top 6, a fridge of *n* items costs at most *n* + 6 uncached API calls, however many recipes match.
+The `SKILLS` below were dervied from my workflow as I was building with Claude Code. The global `CLAUDE.md` (not shared here) holds the rules that dicatate terms and conditions to Claude Code to work the way I do, so that its output reaches the repository through my engineering conventions.
 
-**Expiry weights (`src/lib/expiry.js`)**
-
-| Status | Days left | Weight |
+| Skill or rule | What it enforces | Where this project shows it |
 |---|---|---|
-| Use now | 2 or fewer | 3 |
-| Use soon | 3 to 5 | 2 |
-| Expired | Past use-by | 2 |
-| Fresh | More than 5 | 1 |
-
-### Edge cases handled
-
-An empty search returns `{"meals": null}`, which is treated as an empty list with a friendly message.
-
-![Recipe Matches showing a friendly message that no recipes were found and suggesting common staples](images/report/no-results.png)
-
-If no recipe uses more than one item, a "closest matches" notice is shown.
-
-![Recipe Matches showing the closest matches notice above single-item recipe cards](images/report/closest.png)
-
-## Resilience
-
-The shared test key may be rate-limited, so the API layer has two defences. Every response is cached in `localStorage` for 24 hours. If TheMealDB can't be reached because of an offline connection, CORS or a rate limit, the app falls back to a small offline sample dataset and shows a banner.
-
-![Recipe Matches showing the offline sample banner above recipes from the sample dataset](images/report/offline.png)
-
-## Code structure
-
-Logic that can be tested on its own is kept in pure modules under `src/lib/`, separate from React components. Unit tests cover matching, expiry and instruction steps.
-
-```text
-src/
-  api/mealdb.js          TheMealDB calls + cache + offline fallback
-  lib/expiry.js          days-left, status buckets, weights
-  lib/matching.js        rankRecipes, splitIngredients (pure, unit-tested)
-  lib/instructions.js    splitInstructions: recipe text to checklist steps
-  context/FridgeContext  fridge items + cooking log
-  pages/                 FridgePage, MatchesPage, SavedPage
-  components/            RecipeModal, InstructionChecklist
-```
-
-## Known limitations
-
-TheMealDB has a small curated recipe set, so some fridges will get few matches. Fridge data also lives in a single browser until the planned sync work is built.
-
-## Build and deployment
-
-GitHub Actions (`.github/workflows/deploy.yml`) lints, tests and builds every change. Pull requests stop there; a push to `main` publishes the new build to GitHub Pages.
-
-```mermaid
-flowchart LR
-  PR[Pull request to main] --> B
-  M[Push to main] --> B
-  W[Manual run] --> B
-  B["build: npm ci → lint → test → build"] -->|PR| X[Stop: checks only]
-  B -->|main| U[Upload dist/ as Pages artifact] --> D[deploy: actions/deploy-pages] --> L[Live site]
-```
-
-The build uses relative asset paths (`base: './'`) and `HashRouter`, so it works under the `/RescueRecipeBuilder/` sub-path.
-
-## Current build and future plans
-
-The full-stack work is planned for after the course project; it is not yet built and is not part of the submission. The goal is an installable, offline-capable app that syncs a signed-in user's fridge and cooking log across devices on free cloud tiers.
-
-Green solid boxes exist today. Orange dashed boxes and dotted arrows are planned.
-
-```mermaid
-flowchart TB
-  USER([User]) --> UI
-
-  subgraph CURRENT["Current build: static site on GitHub Pages"]
-    UI["React pages<br/>My Fridge, Recipe Matches, Saved from Waste"]
-    CTX["FridgeContext<br/>fridge items + cooking log"]
-    LIB["Pure logic<br/>matching, expiry, instructions"]
-    API["api/mealdb.js<br/>24 h cache + offline fallback"]
-    LS[("localStorage")]
-    UI --> CTX & LIB & API
-    CTX --> LS
-    API --> LS
-  end
-
-  API -->|"filter, lookup, list"| MDB["TheMealDB API"]
-
-  subgraph PLANNED["Planned: not yet built"]
-    SW["Phase 1: service worker<br/>installable PWA"]
-    IDB[("Phase 3: IndexedDB<br/>+ outbox of changes")]
-    SWA["Phase 2: Azure Static Web Apps<br/>hosting + sign-in"]
-    FN["Phase 2: Azure Functions API"]
-    SQL[("Phase 2: Azure SQL Database<br/>free offer")]
-    IDB -.->|"Phase 3: POST /api/sync"| SWA
-    SWA -.-> FN
-    FN -.->|"parameterised SQL"| SQL
-  end
-
-  LS -.->|"replaced by"| IDB
-  API -.->|"recipes through"| SW
-  SW -.-> MDB
-
-  classDef built fill:#e3f1e8,stroke:#198754,color:#1f2421
-  classDef planned fill:#fdeee2,stroke:#b84f0b,color:#1f2421,stroke-dasharray:5 4
-  class UI,CTX,LIB,API,LS built
-  class SW,IDB,SWA,FN,SQL planned
-```
-
-| Phase | Planned features |
-|---|---|
-| **1. Installable PWA** | Manifest and icons; Workbox service worker so the app opens offline; cached recipes and images; update prompt; offline indicator. |
-| **2. Backend** | Azure Static Web Apps hosting; Azure Functions API using `mssql`; Azure SQL tables for users, fridge items and the cooking log; SQL migrations; CI with preview environments. |
-| **3. Sign-in and sync** | GitHub or Microsoft sign-in; IndexedDB with an outbox of pending changes; one `POST /api/sync` round trip (last write wins); first sign-in import; anonymous use stays local. |
-| **4. Hardening** | API and sync tests, including that every query is scoped to the signed-in user; retry with backoff during database wake-up; budget alert; setup guide. |
-
-## Key design constraints
-
-- **No database credentials in the browser.** The connection string stays in server-side app settings; the browser only talks to `/api`.
-- **Free tiers.** Azure SQL's free offer gives each database 100,000 vCore seconds and 32 GB of data per month and auto-pauses when idle, so the app saves locally first and syncs in the background.
-- **Own API code.** The Static Web Apps "database connections" feature has been retired, so the API is custom Azure Functions code.
-
-## License
-
-Copyright © 2026 Prakirth Govardhanam. Free software under the GNU Affero General Public License v3 or later. Anyone running a modified version as a network service must offer its users the corresponding source code.
+| `dev-driver-mode` | Before each issue, asks whether I drive (Claude coaches, no code) or Claude drives | Asked before each issue; I chose Claude drives for [#2](https://github.com/prakgov/RescueRecipeBuilder/issues/2), [#5](https://github.com/prakgov/RescueRecipeBuilder/issues/5), [#7](https://github.com/prakgov/RescueRecipeBuilder/issues/7) |
+| `dev-git-issue-pr` | Issue with a checklist of the agreed plan, `<type>/<slug>` branches, Conventional Commits, "Area: summary" PR titles, ask before push or force-push | Issues #2, #5, #7; branches such as `ci/github-pages-deploy`, `feat/recipe-instruction-checklist`; PRs [#3](https://github.com/prakgov/RescueRecipeBuilder/pull/3)–[#10](https://github.com/prakgov/RescueRecipeBuilder/pull/10) |
+| `dev-task-playbooks` | Bug, feature and refactor playbooks: reproduce first, acceptance criteria to failing tests (TDD/BDD), no behaviour change in refactors | Verbatim-split unit test for the step checklist ([PR #6](https://github.com/prakgov/RescueRecipeBuilder/pull/6)) |
+| `design-hld` / `design-lld` | Mermaid high-level and component-level designs before building | Architecture and planned full-stack design with diagrams ([PR #8](https://github.com/prakgov/RescueRecipeBuilder/pull/8)) |
+| `kms-session-closeout` | Session log, reflection log and PSP time row in my Obsidian vault after each session | 4 logged sessions, 2026-11-03 to 2026-11-09, with estimated vs actual hours |
+| `kms-adr` | Architecture decision record when a change touches more than three files and involves a design decision | Checked at each closeout; no change has needed one yet |
+| Global `CLAUDE.md` | Pair programming: explain first, agree the plan before code, small reviewable steps, ask before dependencies, pushes and history rewrites | Force-push approved explicitly once ([PR #3](https://github.com/prakgov/RescueRecipeBuilder/pull/3) era); report tooling kept out of project dependencies |
