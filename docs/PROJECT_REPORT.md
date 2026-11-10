@@ -10,7 +10,7 @@ Prakirth Govardhanam | November 2026 | Repository: [RescueRecipeBuilder](https:/
 - [3. AI usage statement](#3-ai-usage-statement)
 - [4. Reflection](#4-reflection)
 - [Appendix: My Claude Code workflow](#appendix-my-claude-code-workflow)
-- [More Technical detail](TECHNICAL_OVERVIEW.md): matching algorithm, fallbacks, deployment, architecture and roadmap diagrams
+- [More Technical detail](https://github.com/prakgov/RescueRecipeBuilder/blob/f39e77755c256edfb7cbb9a212b692b8e2721855/docs/TECHNICAL_OVERVIEW.md): matching algorithm, fallbacks, deployment, architecture and roadmap diagrams
 
 
 ## 1. Project description
@@ -64,7 +64,7 @@ Screenshots were taken using sample data.
 
 ## 4. Reflection
 
-- The most challenging part was designing around an API that offered free, keyless access, so the application could be deployed and used right away. I started by focusing on the idea that I want to build something specific for myself that helps me on a daily basis. From there, I researched APIs that would allow me to build a recipe app and I found TheMealDB but it only allows filtering by one ingredient at a time. Then I had to figure out how to implement a multi-ingredient matching algorithm on the client side, which was a fun challenge. I also had to consider how to handle edge cases, such as when no recipes match the user's fridge items, and how to provide a good user experience in those situations. See [Technical Overview](TECHNICAL_OVERVIEW.md) for matching algorithm. I chose TheMealDB over Spoonacular for the app to be deployed and used without any barriers.
+- The most challenging part was designing around an API that offered free, keyless access, so the application could be deployed and used right away. I started by focusing on the idea that I want to build something specific for myself that helps me on a daily basis. From there, I researched APIs that would allow me to build a recipe app and I found TheMealDB but it only allows filtering by one ingredient at a time. Then I had to figure out how to implement a multi-ingredient matching algorithm on the client side, which was a fun challenge. I also had to consider how to handle edge cases, such as when no recipes match the user's fridge items, and how to provide a good user experience in those situations. See [Technical Overview](https://github.com/prakgov/RescueRecipeBuilder/blob/f39e77755c256edfb7cbb9a212b692b8e2721855/docs/TECHNICAL_OVERVIEW.md) for matching algorithm. I chose TheMealDB over Spoonacular for the app to be deployed and used without any barriers.
 - I opted for `localStorage` instead of a backend to keep the app simple and user-friendly, and used `HashRouter` with relative paths to ensure compatibility with GitHub Pages. I also separated pure logic into `src/lib` for easier unit testing and chose a flex sticky footer over a fixed position to improve layout responsiveness and keep it from covering the content. Additionally, I selected the AGPL license to keep the code open-sourced forever.
 - With more time, I would focus on testing the application thoroughly, implementing the planned roadmap phases, including making the app an installable PWA, adding an Azure backend for data synchronization, and enabling user sign-in to sync fridge and cooking log data across devices. I would also address the recipe card vs modal count mismatch bug.
 - Overall, I gained a deeper understanding of how to handle API limitations, implement client-side logic for data processing, and design a user-friendly interface that effectively helps users reduce food waste. 
