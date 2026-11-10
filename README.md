@@ -68,7 +68,11 @@ For diagrams of how these pieces fit together, see [docs/ARCHITECTURE.md](docs/A
 
 ## Run it
 
+Requires [Node.js](https://nodejs.org/) 20 or newer (the CI workflow builds with Node 24) and npm.
+
 ```bash
+git clone https://github.com/prakgov/RescueRecipeBuilder.git
+cd RescueRecipeBuilder
 npm install
 npm run dev      # http://localhost:5173
 npm test         # unit tests (matching, expiry, instruction steps)
