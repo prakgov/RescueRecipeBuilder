@@ -13,7 +13,7 @@ FridgeSaver makes no CO₂ or money-saved claims. Its impact figures only count 
   - GitHub: source control, issues, pull requests, CI/CD, Pages hosting
   - Visual Studio Code: editor and debugger
   - Claude Code (Sonnet/Opus): planning, coding, refactoring, debugging
-  - Chrome DevTools: browser debugging and screenshots
+  - Chrome DevTools: browser debugging/headless Edge and Playwright for screenshots
   - Mermaid MCP server: architecture diagrams
 
 - Tech stack:
